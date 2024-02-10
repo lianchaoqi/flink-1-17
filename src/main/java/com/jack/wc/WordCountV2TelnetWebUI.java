@@ -21,6 +21,7 @@ public class WordCountV2TelnetWebUI {
     public static void main(String[] args) throws Exception {
 //        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(new Configuration());
+//        env.disableOperatorChaining()
         DataStreamSource<String> socketTextStream = env.socketTextStream("hadoop101", 7777);
         SingleOutputStreamOperator<Tuple2<String, Integer>> outputStreamOperator = socketTextStream.flatMap(
                         (String line, Collector<Tuple2<String, Integer>> out) -> {
@@ -29,7 +30,9 @@ public class WordCountV2TelnetWebUI {
                                 out.collect(Tuple2.of(word, 1));
                             }
                         }
-                ).returns(Types.TUPLE(Types.STRING, Types.INT))
+                )
+                .returns(Types.TUPLE(Types.STRING, Types.INT))
+//                .disableChaining()
                 .keyBy(value -> value.f0)
                 .sum(1);
         outputStreamOperator.print();
