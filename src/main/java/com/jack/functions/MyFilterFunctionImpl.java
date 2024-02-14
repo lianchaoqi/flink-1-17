@@ -13,8 +13,14 @@ import org.apache.flink.api.common.functions.MapFunction;
  * @Version: jdk1.8
  */
 public class MyFilterFunctionImpl implements FilterFunction<WaterSensor> {
+    private Integer vc;
+
+    public MyFilterFunctionImpl(Integer vc) {
+        this.vc = vc;
+    }
+
     @Override
     public boolean filter(WaterSensor value) throws Exception {
-        return value.getVc() > 100;
+        return value.getVc() > this.vc;
     }
 }

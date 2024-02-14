@@ -27,7 +27,7 @@ public class FilterApiDemo {
                 new WaterSensor("3", 12L, 1)
         );
 
-        SingleOutputStreamOperator<WaterSensor> filter = sensorDataStreamSource.filter(new MyFilterFunctionImpl());
+        SingleOutputStreamOperator<WaterSensor> filter = sensorDataStreamSource.filter(new MyFilterFunctionImpl(100));
         filter.print();
         env.execute();
     }

@@ -16,7 +16,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * @Description: ~~~~
  * @Version: jdk1.8
  */
-public class Api01SumMaxApiDemo {
+public class Api02SumMaxApiDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(new Configuration());
 
