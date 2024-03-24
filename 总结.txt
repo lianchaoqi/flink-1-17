@@ -1,3 +1,5 @@
 1.算子链（可以分开，也可以串联，类似于sparkRDD的阶段切分）disableChaining、disableOperatorChaining（全局）
 2、跟connector相关的算子都得导入依赖
 3、max与maxby，max保留第一次by的其他属性数据，而maxby会取新的max的数据
+4、窗口：（时间=》滑动窗口，会话窗口，滚动窗口）、（事件=》滑动、滚动）
+5、窗口的生命周期（第一个窗口驱动来时创建，window单例集合，）
