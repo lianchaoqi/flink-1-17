@@ -12,10 +12,11 @@ import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+
+import java.time.Duration;
 
 /**
  * @BelongsProject: flink-1-17
@@ -25,11 +26,11 @@ import org.apache.flink.util.Collector;
  * @Description: ~~~~
  * @Version: jdk1.8
  */
-public class WaterMonoDemo {
+public class AllowLateParaDurationDemo {
     public static void main(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
+        env.setParallelism(2);
 
         DataStreamSource<String> socketTextStream = env.socketTextStream("hadoop101", 7777);
 
@@ -39,7 +40,7 @@ public class WaterMonoDemo {
         //添加时间水位线  获取时间的时间水位线
         WatermarkStrategy<WaterSensor> waterSensorWatermarkStrategy =
                 WatermarkStrategy
-                        .<WaterSensor>forMonotonousTimestamps()
+                        .<WaterSensor>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner(new SerializableTimestampAssigner<WaterSensor>() {
                             @Override
                             public long extractTimestamp(WaterSensor waterSensor, long recordTimestamp) {
@@ -55,7 +56,10 @@ public class WaterMonoDemo {
 
         WindowedStream<WaterSensor, String, TimeWindow> window =
                 //TODO:开始事件窗口
-                waterSensorStringKeyedStream.window(TumblingEventTimeWindows.of(Time.seconds(10)));
+                waterSensorStringKeyedStream
+                        .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                        .allowedLateness(Time.seconds(2))
+                ;
         SingleOutputStreamOperator<String> process = window.process(new ProcessWindowFunction<WaterSensor, String, String, TimeWindow>() {
             @Override
             public void process(String key, ProcessWindowFunction<WaterSensor, String, String, TimeWindow>.Context context, Iterable<WaterSensor> elements, Collector<String> out) throws Exception {
